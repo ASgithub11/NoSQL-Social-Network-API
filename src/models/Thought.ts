@@ -19,10 +19,10 @@ const thoughtSchema = new Schema<IThought>(
             minlength: 1,       // Minimum length of the thought text
             maxlength: 280,     // Maximum length of the thought text
         },
-        // createdAt field with default value of the current timestamp
+        // createdAt field to store the date the thought was created
         createdAt: {
             type: Date,         // Data type is Date
-            default: Date.now,  // Default value is the current timestamp
+            default: Date.now,  // Default value is the current timestamp when a thought is created
         },
         // Username field to store the username of the user who created the thought
         username: {
@@ -46,9 +46,9 @@ const thoughtSchema = new Schema<IThought>(
     }
 );
 
-// Virtual property to get the total count of reactions on a thought
+// Create a virtual property `reactionCount` that retrieves the length of the `reactions` array field on query
 thoughtSchema.virtual('reactionCount').get(function () {
-    return this.reactions.length;
+    return this.reactions.length; // Returns the total count of reactions on this thought
 });
 
 // Create the Thought model using the thoughtSchema
