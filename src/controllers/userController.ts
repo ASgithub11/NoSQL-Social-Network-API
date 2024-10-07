@@ -24,6 +24,7 @@ export const getOneUser = async (req: Request, res: Response) => {
         }
         // If user is found, send the user data as JSON response
         res.json(user);
+        return;
     } catch (err: any) {
         res.status(500).json(err); // If an error occurs, send a 500 status and the error message
         return;
