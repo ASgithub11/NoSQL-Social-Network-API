@@ -1,13 +1,12 @@
-import {Schema, model, Document, ObjectId} from 'mongoose';
-import Reaction from './Reaction.js';
+import { Schema, model, type Document } from 'mongoose';
 
 // Interface to define the structure of a User document
-interface IUser extends Document {
+export interface IUser extends Document {
     username: string;           // Username of the user
     email: string;              // Email of the user
-    thoughts: ObjectId[];       // Array of Thought IDs associated with the user
-    friends: ObjectId[];        // Array of User IDs representing the user's friends
-    reactions: { type: ObjectId; ref: 'Reaction'}[];    // Array of references to Reaction documents
+    thoughts: Schema.Types.ObjectId[];       // Array of Thought IDs representing the user's thoughts
+    friends: Schema.Types.ObjectId[];        // Array of User IDs representing the user's friends
+    friendCount?: number;       // Virtual field to show the count of a user's friends
 }
 
 // Schema to create the User model
@@ -48,34 +47,22 @@ const userSchema = new Schema<IUser>(
                 ref: 'User',                    // Reference to the User model
             },
         ],
-        // Array of ObjectIds referencing the Reaction model to store user reactions
-        reactions: [
-            {
-                type: Schema.Types.ObjectId,    // Each entry is an ObjectId
-                ref: 'Reaction',                // Reference to the Reaction model
-            },
-        ],
     },
     {
         toJSON: {
             virtuals: true, // Include virtuals in JSON output when converting a document to JSON
         },
-        id: false,  // Do not include the default `id` field
+        timestamps: true,   // Include timestamps in the document
     }
 );
 
-// Create a virtual property `friendCount` that retrieves the length of the user's friends array field on query
-userSchema.virtual('friendCount').get(function() {
-    return this.friends.length; // Returns the number of friends
-});
-
-// Create a virtual property `reactionCount` that retrieves the length of the `reactions` array field on query
-userSchema.virtual('reactionCount').get(function() {
-    return this.reactions.length;   // Returns the number of reactions
+// Virtual to calculate the number of friends for a user and return the count
+userSchema.virtual('friendCount').get(function (this: IUser) {
+    return this.friends.length;
 });
 
 // Create the User model using the userSchema
 const User = model<IUser>('User', userSchema);
 
-// Export the User model for use in other parts of the application
+// Export the User model
 export default User;

@@ -1,12 +1,15 @@
-import { Schema, model, Document } from 'mongoose';
-import Reaction from './Reaction.js';
+import { Schema, model, Types, type Document } from 'mongoose';
+import reactionSchema from './Reaction.js';
+import moment from 'moment';
 
 // Interface to define the structure of a Thought document
 interface IThought extends Document {
     thoughtText: string;        // Text content of the thought
-    createdAt: Date;            // Date the thought was created
+    createdAt: Date | string;   // Date the thought was created or formatted string
     username: string;           // Username of the user who created the thought
-    reactions: { type: Schema.Types.ObjectId; ref: 'Reaction' }[]; // Array of references to Reaction documents
+    thoughtId: Schema.Types.ObjectId;      // ID of the thought
+    reactions: Types.Array<Document>;       // Array of Reaction subdocuments
+    reactionCount?: number;     // Virtual field to show the count of reactions on a thought
 }
 
 // Schema to create the Thought model
@@ -23,32 +26,33 @@ const thoughtSchema = new Schema<IThought>(
         createdAt: {
             type: Date,         // Data type is Date
             default: Date.now,  // Default value is the current timestamp when a thought is created
+            get: (timestamp: Date) => moment(timestamp).format('MMM DD, YYYY [at] hh:mm a'),    // Getter method to format the timestamp
         },
         // Username field to store the username of the user who created the thought
         username: {
             type: String,       // Data type is String
             required: true,     // This field is required
         },
-        // Array of ObjectIds referencing the Reaction model to store user reactions
-        reactions: [
-            {
-                type: Schema.Types.ObjectId,    // Each entry is an ObjectId
-                ref: 'Reaction',                // Reference to the Reaction model
-            },
-        ],
+        // ID of the thought
+        thoughtId: {
+            type: Schema.Types.ObjectId,    // Data type is ObjectId
+            default: () => new Types.ObjectId(), // Default value is a new ObjectId
+        },
+        // Array of nested Reaction documents to store user reactions
+        reactions: [reactionSchema],
     },
     {
         toJSON: {
             virtuals: true,     // Include virtual properties when data is serialized
-            getters: true,      // Apply getters when data is serialized
+            getters: true,      // Enable getters to apply custom formatting
         },
-        id: false,              // Disable virtual "id" property
+        timestamps: true,       // Include timestamps in the document
     }
 );
 
-// Create a virtual property `reactionCount` that retrieves the length of the `reactions` array field on query
-thoughtSchema.virtual('reactionCount').get(function () {
-    return this.reactions.length; // Returns the total count of reactions on this thought
+// Virtual to calculate the number of reactions for a thought and return the length of the reactions array
+thoughtSchema.virtual('reactionCount').get(function (this: IThought) {
+    return this.reactions.length;
 });
 
 // Create the Thought model using the thoughtSchema
