@@ -6,7 +6,6 @@ export interface IUser extends Document {
     email: string;              // Email of the user
     thoughts: Schema.Types.ObjectId[];       // Array of Thought IDs representing the user's thoughts
     friends: Schema.Types.ObjectId[];        // Array of User IDs representing the user's friends
-    friendCount?: number;       // Virtual field to show the count of a user's friends
 }
 
 // Schema to create the User model
@@ -24,13 +23,12 @@ const userSchema = new Schema<IUser>(
             type: String,   // Data type is String
             required: true, // This field is required
             unique: true,   // Value must be unique across all users
-            maxlength: 50,  // Max allowed length of the email
             validate: {
                 // Custom validator to ensure the email is in the valid format
-                validator: function(v: string) {
+                validator: function(v) {
                     return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v);
                 },
-                message: (props: { value: string }) => `${props.value} is not a valid email address.`,
+                message: props => `${props.value} is not a valid email address.`,
             },
         },
         // Array of Thought IDs referencing the Thought model
@@ -58,7 +56,7 @@ const userSchema = new Schema<IUser>(
 
 // Virtual to calculate the number of friends for a user and return the count
 userSchema.virtual('friendCount').get(function (this: IUser) {
-    return this.friends.length;
+    return this.friends?.length;
 });
 
 // Create the User model using the userSchema

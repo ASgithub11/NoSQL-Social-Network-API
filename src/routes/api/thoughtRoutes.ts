@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllThoughts, getOneThoughtById, createThought, updateThought, deleteThought, addReaction, removeReaction, getAllReactions } from '../../controllers/thoughtController.js';
+import { getAllThoughts, getOneThoughtById, createThought, updateThoughtById, deleteThought, addReaction, removeReaction, getAllReactions } from '../../controllers/thoughtController.js';
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.route('/').get(getAllThoughts).post(createThought);
 router
     .route('/:thoughtId')
     .get(getOneThoughtById)
-    .put(updateThought)
+    .put(updateThoughtById)
     .delete(deleteThought);
 
 // /api/thoughts/:thoughtId/reactions
