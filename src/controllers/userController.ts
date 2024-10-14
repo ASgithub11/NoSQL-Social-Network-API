@@ -52,22 +52,20 @@ export const createUser = async (req: Request, res: Response) => {
 };
 
 // Update a user by ID
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUserById = async (req: Request, res: Response) => {
     try {
         const user = await User.findOneAndUpdate(
             { _id: req.params.userId }, // Find a user by ID
             { $set: req.body },         // Update fields with the request body data
-            { runValidators: true, new: true }, // Validate the data and return the new user
+            { new: true },              // Return the new user
         );
         if (!user) {
-            res.status(404).json({message: 'No user found with this id!'});
+            return res.status(404).json({message: 'No user found with this id!'});
         }
         // Send a success message as JSON response
-        res.json(user)
-    } catch (error: any) {
-        res.status(500).json({
-            message: error.message   // If an error occurs, send a 500 status and the error message
-        });
+        return res.json(user)
+    } catch (err) {
+        return res.status(500).json(err); // If an error occurs, send a 500 status and the error message
     }
 };
 
@@ -121,7 +119,7 @@ export const deleteFriend = async (req: Request, res: Response) => {
             { $pull: { friends: friendId }}, // Remove the friend ID from the user's friend list
             { new: true },                   // Return the updated document
         );
-        if (!updateUser) {
+        if (!updateUserById) {
             res.status(404).json({ message: 'No user found with this id!' });
         } else {
             res.json(updatedUser);

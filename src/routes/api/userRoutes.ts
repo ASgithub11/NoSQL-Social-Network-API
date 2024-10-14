@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getallUsers, getOneUserById, createUser, updateUser, deleteUser, addFriend, deleteFriend, getAllFriends } from '../../controllers/userController.js';
+import { getallUsers, getOneUserById, createUser, updateUserById, deleteUser, addFriend, deleteFriend, getAllFriends } from '../../controllers/userController.js';
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.route('/').get(getallUsers).post(createUser);
 router
     .route('/:userId')
     .get(getOneUserById)
-    .put(updateUser)
+    .put(updateUserById)
     .delete(deleteUser);
 
 // /api/users/:userId/friends

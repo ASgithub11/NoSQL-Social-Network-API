@@ -46,13 +46,11 @@ export const createThought = async (req: Request, res: Response) => {
             { runValidators: true, new: true }  // Run validators and return the updated user
         );
         if (!user) {
-            res.status(404).json({ message: 'No user found with this id!' });
+            return res.status(404).json({ message: 'No user found with this id!' });
         }
-        res.status(201).json(newthought);
-    } catch (error: any) {
-        res.status(400).json({
-            message: error.message
-        });
+        return res.json(newthought);
+    } catch (err) {
+        return res.status(500).json(err); // If an error occurs, send a 500 status and the error message
     }
 };
 

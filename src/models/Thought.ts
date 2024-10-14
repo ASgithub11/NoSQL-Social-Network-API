@@ -76,6 +76,11 @@ const thoughtSchema = new Schema<IThought>(
             type: String,       // Data type is String
             required: true,     // This field is required
         },
+        userId: {
+            type: Schema.Types.ObjectId, // Data type is ObjectId
+            ref: 'User',                 // Reference to the User model
+            required: true,             // This field is required
+        },
         // Array of nested Reaction documents to store user reactions
         reactions: [reactionSchema],
     },
